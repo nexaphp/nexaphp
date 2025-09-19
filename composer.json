@@ -1,0 +1,64 @@
+{
+    "name": "nexaphp/nexaphp",
+    "type": "project",
+    "description": "The NexaPHP Framework built on top of Slim",
+    "keywords": [
+        "nexaphp",
+        "framework",
+        "psr",
+        "twig"
+    ],
+    "homepage": "https://github.com/nexaphp/nexaphp",
+    "license": "MIT",
+    "support": {
+        "issues": "https://github.com/nexaphp/nexaphp/issues",
+        "source": "https://github.com/nexaphp/nexaphp"
+    },
+    "authors": [
+        {
+            "name": "Joseph Asamoah",
+            "email": "asamoahjoseph@gmail.com",
+            "homepage": "https://github.com/jobascudi",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.4 || ^8.2",
+        "ext-json": "*",
+        "nexaphp/framework": "^1.0.0"
+    },
+    "require-dev": {
+        "jangregor/phpstan-prophecy": "^1.0.2",
+        "phpspec/prophecy-phpunit": "^2.2.0",
+        "phpstan/extension-installer": "^1.4.1",
+        "phpstan/phpstan": "^1.11.9",
+        "phpunit/phpunit": "^9.6.20",
+        "squizlabs/php_codesniffer": "^3.10.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\": "tests"
+        }
+    },
+    "scripts": {
+        "start": "php -S localhost:8080 -t public",
+        "test": "phpunit",
+        "check-style": "phpcs src tests",
+        "fix-style": "phpcbf src tests",
+        "post-root-package-install": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ]
+    },
+    "config": {
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        },
+        "process-timeout": 0,
+        "sort-packages": true
+    }
+}

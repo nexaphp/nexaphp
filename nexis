@@ -1,0 +1,25 @@
+#!/usr/bin/env php
+<?php
+// nexa (in project root)
+
+define('BASE_PATH', dirname(__DIR__));
+require BASE_PATH . '/vendor/autoload.php';
+
+use Nexacore\Foundation\Nexa;
+use Nexacore\Console\Kernel;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
+
+// Create the application instance
+$app = require BASE_PATH . '/bootstrap/app.php';
+
+// Create the console kernel
+$kernel = $app->getContainer()->get('console.kernel');
+
+// Handle the console command
+$input = new ArgvInput();
+$output = new ConsoleOutput();
+
+$status = $kernel->handle($input, $output);
+
+exit($status);
