@@ -1,25 +1,54 @@
 #!/usr/bin/env php
 <?php
-// nexa (in project root)
+declare(strict_types=1);
 
-define('BASE_PATH', dirname(__DIR__));
-require BASE_PATH . '/vendor/autoload.php';
+/**
+ * NexaPHP Console Application
+ * 
+ * This is the main entry point for console commands.
+ * It provides Artisan-like functionality for the framework.
+ * 
+ * @package NexaPHP
+ */
 
-use Nexacore\Foundation\Nexa;
-use Nexacore\Console\Kernel;
-use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Output\ConsoleOutput;
+// Check if running from CLI
+if (PHP_SAPI !== 'cli') {
+    exit('This script can only be run from the command line.');
+}
 
-// Create the application instance
-$app = require BASE_PATH . '/bootstrap/app.php';
+// Application banner
+$banner = <<<BANNER
+    ________   _______      ___    ___ ___  ________      
+|\   ___  \|\  ___ \    |\  \  /  /|\  \|\   ____\     
+\ \  \\ \  \ \   __/|   \ \  \/  / | \  \ \  \___|_    
+ \ \  \\ \  \ \  \_|/__  \ \    / / \ \  \ \_____  \   
+  \ \  \\ \  \ \  \_|\ \  /     \/   \ \  \|____|\  \  
+   \ \__\\ \__\ \_______\/  /\   \    \ \__\____\_\  \ 
+    \|__| \|__|\|_______/__/ /\ __\    \|__|\_________\
+                        |__|/ \|__|        \|_________|
+                                                       
+                                                       
+                                       
+  NexaPHP Framework - Console Tool
+  Version 1.0.0
 
-// Create the console kernel
-$kernel = $app->getContainer()->get('console.kernel');
+BANNER;
 
-// Handle the console command
-$input = new ArgvInput();
-$output = new ConsoleOutput();
+echo $banner;
 
-$status = $kernel->handle($input, $output);
+// Bootstrap the console application
+$app = require __DIR__ . '/bootstrap/console.php';
+
+// Create console kernel
+$kernel = $app->make(NexaCore\Console\ConsoleKernel::class);
+
+// Run the console application
+$status = $kernel->handle(
+    new Symfony\Component\Console\Input\ArgvInput(),
+    new Symfony\Component\Console\Output\ConsoleOutput()
+);
+
+// Terminate the application
+$kernel->terminate(new Symfony\Component\Console\Input\ArgvInput(), $status);
 
 exit($status);

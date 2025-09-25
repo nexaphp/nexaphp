@@ -1,57 +1,55 @@
 <?php
-// bootstrap/app.php
 
 declare(strict_types=1);
 
-use Nexacore\Foundation\Nexa;
-use Nexacore\Providers\ConfigServiceProvider;
-use Nexacore\Providers\AppServiceProvider;
-use Nexacore\Providers\DatabaseServiceProvider;
-use Nexacore\Providers\AuthServiceProvider;
-use Nexacore\Providers\RouteServiceProvider;
-use Nexacore\Providers\LogServiceProvider;
-use Nexacore\Providers\ConsoleServiceProvider;
-
 /**
- * NexaPHP Application Bootstrap
+ * Bootstrap File for NexaPHP Application
  */
 
-// Create the NexaPHP application instance
-$app = new Nexa(dirname(__DIR__));
+// Register the auto-loader
+require_once __DIR__ . '/../vendor/autoload.php';
 
-// Register configuration service provider first
-$app->register(ConfigServiceProvider::class);
+// Create application instance
+$app = new NexaCore\Foundation\Application(dirname(__DIR__));
 
-// Register logging service provider early for error handling
-$app->register(LogServiceProvider::class);
+try {
+    // Load configuration first
+    $app->registerProvider(NexaCore\Providers\ConfigServiceProvider::class);
 
-// Get the configuration for service provider registration
-$config = $app->get('config');
+    // Register core service providers
+    $providers = [
+        NexaCore\Providers\LogServiceProvider::class,
+        NexaCore\Providers\DatabaseServiceProvider::class,
+        NexaCore\Providers\SessionServiceProvider::class,
+        NexaCore\Providers\ViewServiceProvider::class,
+        NexaCore\Providers\AuthServiceProvider::class,
+        NexaCore\Providers\RouteServiceProvider::class,
+        NexaCore\Providers\MiddlewareServiceProvider::class,
+    ];
 
-// Register core framework service providers
-$app->register(AppServiceProvider::class);
-$app->register(DatabaseServiceProvider::class);
-
-// Register console service provider if running in console
-if (php_sapi_name() === 'cli') {
-    $app->register(ConsoleServiceProvider::class);
-} else {
-    // Web-specific providers
-    $app->register(AuthServiceProvider::class);
-    $app->register(RouteServiceProvider::class);
-}
-
-// Register application service providers from config
-if (isset($config['app']['providers'])) {
-    foreach ($config['app']['providers'] as $provider) {
-        if (class_exists($provider)) {
-            $app->register($provider);
-        }
+    foreach ($providers as $provider) {
+        $app->registerProvider($provider);
     }
+
+    // Boot the application
+    $app->boot();
+
+} catch (Throwable $e) {
+    // Handle bootstrap errors
+    header('Content-Type: text/plain; charset=utf-8');
+    http_response_code(500);
+    
+    if (($_ENV['APP_DEBUG'] ?? false) || ini_get('display_errors')) {
+        echo "Bootstrap Error: " . $e->getMessage() . "\n";
+        echo "File: " . $e->getFile() . ":" . $e->getLine() . "\n";
+        if ($_ENV['APP_DEBUG'] ?? false) {
+            echo "Trace:\n" . $e->getTraceAsString() . "\n";
+        }
+    } else {
+        echo "Application bootstrap failed. Please try again later.";
+    }
+    
+    exit(1);
 }
 
-// Set the base path for the application
-$app->setBasePath(dirname(__DIR__));
-
-// Return the application instance
 return $app;
