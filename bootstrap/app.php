@@ -1,55 +1,23 @@
 <?php
 
-declare(strict_types=1);
+use Nexacore\Foundation\Application;
+
+require __DIR__ . '/../vendor/autoload.php';
 
 /**
- * Bootstrap File for NexaPHP Application
+ * ------------------------------------------------------------
+ * Create The Application
+ * ------------------------------------------------------------
+ *
+ * This script bootstraps the NexaPHP application. It loads
+ * environment variables, config files, and builds the DI
+ * container and Slim app.
+ *
  */
 
-// Register the auto-loader
-require_once __DIR__ . '/../vendor/autoload.php';
+$basePath = dirname(__DIR__);
 
-// Create application instance
-$app = new NexaCore\Foundation\Application(dirname(__DIR__));
-
-try {
-    // Load configuration first
-    $app->registerProvider(NexaCore\Providers\ConfigServiceProvider::class);
-
-    // Register core service providers
-    $providers = [
-        NexaCore\Providers\LogServiceProvider::class,
-        NexaCore\Providers\DatabaseServiceProvider::class,
-        NexaCore\Providers\SessionServiceProvider::class,
-        NexaCore\Providers\ViewServiceProvider::class,
-        NexaCore\Providers\AuthServiceProvider::class,
-        NexaCore\Providers\RouteServiceProvider::class,
-        NexaCore\Providers\MiddlewareServiceProvider::class,
-    ];
-
-    foreach ($providers as $provider) {
-        $app->registerProvider($provider);
-    }
-
-    // Boot the application
-    $app->boot();
-
-} catch (Throwable $e) {
-    // Handle bootstrap errors
-    header('Content-Type: text/plain; charset=utf-8');
-    http_response_code(500);
-    
-    if (($_ENV['APP_DEBUG'] ?? false) || ini_get('display_errors')) {
-        echo "Bootstrap Error: " . $e->getMessage() . "\n";
-        echo "File: " . $e->getFile() . ":" . $e->getLine() . "\n";
-        if ($_ENV['APP_DEBUG'] ?? false) {
-            echo "Trace:\n" . $e->getTraceAsString() . "\n";
-        }
-    } else {
-        echo "Application bootstrap failed. Please try again later.";
-    }
-    
-    exit(1);
-}
+/** @var Application $app */
+$app = new Application($basePath);
 
 return $app;
